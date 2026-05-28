@@ -1,3 +1,5 @@
+import copy
+
 import networkx as nx
 from database.DAO import DAO
 
@@ -48,10 +50,47 @@ class Model:
     def num_archi(self):
         return len(self._grafo.edges)
 
+    def get_nodi(self, id):
+        return DAO.getAllNodi(id)
+
     def piu_venduti(self):
         tutti=[]
         for nodo in self._grafo.nodes():
-            tutti=(nodo, self._grafo.degree(nodo, weight='weight'))
-        ordinati=sorted(tutti, key=lambda x: x[1], reverse=True)
+            tutti.append((self._grafo.out_degree(nodo, weight='weight') - self._grafo.in_degree(nodo, weight='weight'), nodo))
+        ordinati=sorted(tutti, key=lambda x: x[0], reverse=True)
         return ordinati[:5] #tuple
+
+    def bestCammino(self, nodo1, nodo2, lun):
+        self._bestSol=[]
+        self._max=0
+
+        self._ricorsione([nodo1], nodo2, lun)
+
+        return self._bestSol
+
+    def _ricorsione(self, parziale, nodo2, lun):
+        #condizione terminale
+        if parziale[-1]==nodo2:
+            if self._getScore(parziale)>self._max:
+                self._max=self._getScore(parziale)
+                self._bestSol=copy.deepcopy(parziale)
+
+        if len(parziale)==lun:
+            return
+
+        else:
+            for nodo in nx.neighbors(self._grafo, parziale[-1]):
+                if nodo not in parziale:
+                    parziale.append(nodo)
+                    self._ricorsione(parziale, nodo2, len)
+
+                    parziale.pop()
+
+    def _getScore(self, parziale):
+        somma=0
+        for n in range(len(parziale)-1):
+            here=parziale[n]
+            succ=parziale[n+1]
+            somma+=self._grafo[here][succ]["weight"]
+        return somma
 

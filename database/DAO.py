@@ -60,6 +60,7 @@ class DAO():
         query = """select *
                     from products p 
                     where p.category_id = %s
+                    order by p.product_name
                     """
 
         cursor.execute(query, (category_id, ))
@@ -81,15 +82,15 @@ class DAO():
         results = []
 
         cursor = conn.cursor(dictionary=True)
-        query = """select a1.product_id as p1, a1.numvendite as n1, a2.product_id as p2, a2.numvendite as n2 
+        query = """select a1.product_id as p1, a1.numVendite as n1, a2.product_id as p2, a2.numVendite as n2 
                     from
-                        (select p.product_id, count(*) as numVendite
+                        (select p.product_id, count(distinct o.order_id) as numVendite
                         from products p, order_items oi, orders o 
                         where p.product_id = oi.product_id and o.order_id = oi.order_id 
                             and o.order_date between %s and %s
                             and p.category_id = %s
                             group by p.product_id) as a1,
-                        (select p.product_id, count(*) as numVendite
+                        (select p.product_id, count(distinct o.order_id) as numVendite
                         from products p, order_items oi, orders o 
                         where p.product_id = oi.product_id and o.order_id = oi.order_id 
                             and o.order_date between %s and %s
