@@ -34,14 +34,14 @@ class Model:
 
                 #arco uscente dal nodo maggiore
                 if coppia[1]>coppia[3]:
-                    self._grafo.add_edge(nodo1, nodo2, weight=coppia[0]+coppia[3])
+                    self._grafo.add_edge(nodo1, nodo2, weight=coppia[1]+coppia[3])
 
                 elif coppia[1]<coppia[3]:
-                    self._grafo.add_edge(nodo2, nodo1, weight=coppia[0] + coppia[3])
+                    self._grafo.add_edge(nodo2, nodo1, weight=coppia[1] + coppia[3])
 
                 else: #coppie uguali: inserisco entrambi gli archi
-                    self._grafo.add_edge(nodo1, nodo2, weight=coppia[0] + coppia[3])
-                    self._grafo.add_edge(nodo2, nodo1, weight=coppia[0] + coppia[3])
+                    self._grafo.add_edge(nodo1, nodo2, weight=coppia[1] + coppia[3])
+                    self._grafo.add_edge(nodo2, nodo1, weight=coppia[1] + coppia[3])
         return
 
     def num_nodi(self):
@@ -70,12 +70,13 @@ class Model:
 
     def _ricorsione(self, parziale, nodo2, lun):
         #condizione terminale
-        if parziale[-1]==nodo2:
+        if parziale[-1]==nodo2 and len(parziale)==lun:
             if self._getScore(parziale)>self._max:
                 self._max=self._getScore(parziale)
                 self._bestSol=copy.deepcopy(parziale)
 
-        if len(parziale)==lun:
+        #soluzione non valida
+        if parziale[-1] == nodo2:
             return
 
         else:
